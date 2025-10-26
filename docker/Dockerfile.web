@@ -19,8 +19,6 @@ RUN a2enmod rewrite \
     && a2enconf docker \
     && sed -i 's!/var/www/html!web!g' /etc/apache2/sites-available/000-default.conf
 
-COPY config/vhost.conf /etc/apache2/sites-available/000-default.conf
-
 EXPOSE 80
 
 ENV DB_HOST=mariadb \
