@@ -1,10 +1,11 @@
 FROM php:7.2-apache
 
-# Usar un mirror alternativo de APT más confiable
-RUN sed -i 's/deb.debian.org/debian.mirror.digitalpacific.com.au/g' /etc/apt/sources.list
+# Restaurar mirror predeterminado y agregar un fallback
+RUN sed -i 's/deb.debian.org/deb.debian.org/g' /etc/apt/sources.list
+RUN echo "deb http://deb.debian.org/debian stretch main" > /etc/apt/sources.list.d/stretch.list
 
-# Ejecutar apt-get update con reintentos para manejar fallos temporales
-RUN apt-get update || apt-get update
+# Intentar actualizar con reintentos y manejo de errores
+RUN apt-get update || { sleep 5; apt-get update; }
 
 # Instalar dependencias
 RUN apt-get install -y wget unzip libzip-dev
