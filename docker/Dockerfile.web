@@ -1,10 +1,12 @@
 FROM php:7.2-apache
 
-# Usar un mirror alternativo de APT para mayor confiabilidad
-RUN sed -i 's/deb.debian.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list
+# Usar un mirror alternativo de APT más confiable
+RUN sed -i 's/deb.debian.org/debian.mirror.digitalpacific.com.au/g' /etc/apt/sources.list
 
-# Actualizar e instalar dependencias por separado
-RUN apt-get update
+# Ejecutar apt-get update con reintentos para manejar fallos temporales
+RUN apt-get update || apt-get update
+
+# Instalar dependencias
 RUN apt-get install -y wget unzip libzip-dev
 
 # Instalar extensiones PHP
