@@ -17,14 +17,14 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 COPY . .
 
-# Ajustar permisos para el directorio web
-RUN chown -R www-data:www-data /var/www/html/web \
-    && chmod -R 755 /var/www/html/web
+# Ajustar permisos y manejar enlaces simbólicos
+RUN chown -R www-data:www-data /var/www/html/web /var/www/html/vendor \
+    && chmod -R 755 /var/www/html/web /var/www/html/vendor \
+    && ln -sf /var/www/html/vendor/twbs/bootstrap/dist/fonts/ /var/www/html/web/fonts
 
 RUN a2enmod rewrite \
-    && echo '<Directory /var/www/html/web>\n    Options Indexes FollowSymLinks\n    AllowOverride All\n    Require all granted\n</Directory>' > /etc/apache2/conf-available/docker.conf \
-    && a2enconf docker \
-    && sed -i 's!/var/www/html!web!g' /etc/apache2/sites-available/000-default.conf
+    && echo '<VirtualHost *:80>\n    ServerName localhost\n    DocumentRoot /var/www/html/web\n    <Directory /var/www/html/web>\n        Options Indexes FollowSymLinks\n        AllowOverride All\n        Require all granted\n    </Directory>\n</VirtualHost>' > /etc/apache2/sites-available/000-default.conf \
+    && a2enmod rewrite
 
 EXPOSE 80
 
